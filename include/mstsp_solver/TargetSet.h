@@ -9,6 +9,7 @@
 #include <vector>
 #include "Target.h"
 #include <cmath>
+#include <math.h>
 #include "MapPolygon.hpp"
 #include "EnergyCalculator.h"
 

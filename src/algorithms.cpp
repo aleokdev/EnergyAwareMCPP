@@ -155,7 +155,7 @@ vpdd thin_polygon_coverage(const MapPolygon &polygon, double sweeping_step, doub
 
 vpdd sweeping(const MapPolygon &polygon, double angle, double sweeping_step, double wall_distance, bool start_up) {
     auto thin_sweeping = thin_polygon_coverage(polygon, sweeping_step, wall_distance);
-    if (not thin_sweeping.empty()) {
+    if (!thin_sweeping.empty()) {
         return thin_sweeping;
     }
 

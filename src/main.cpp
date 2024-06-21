@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
         };
         best_solution = generate_with_constraints(algorithm_config.max_single_path_energy * 3600,
                                                   algorithm_config.number_of_drones, f);
-    } catch (const polygon_decomposition_error &e) {
+    } catch (const polygon_decomposition_error &) {
         std::cout << "Error while decomposing the polygon" << std::endl;
         return -1;
     } catch (const std::runtime_error &e) {
@@ -187,7 +187,7 @@ generate_with_constraints(double max_energy_bound, unsigned int n_uavs, F f) {
             return solution;
         }
         // if the energy consumption is divided well, this should be enough
-        unsigned int updated_n_uavs = std::ceil(solution.path_energies_sum / max_energy_bound);
+        auto updated_n_uavs = static_cast<unsigned int>(std::ceil(solution.path_energies_sum / max_energy_bound));
 
         // if the needed number of UAVs is estimated to be smaller than on previous step, make it larger
         if (updated_n_uavs <= current_n_uavs) {
@@ -227,7 +227,7 @@ std::vector<point_t> read_points_from_csv(const std::string &filename) {
 
     is.close();
     // Make sure that the first point is always the same as the last one
-    if (not points.empty() and points[0] != points[points.size() - 1]) {
+    if (!points.empty() && points[0] != points[points.size() - 1]) {
         points.push_back(points[0]);
     }
     return points;

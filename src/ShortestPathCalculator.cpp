@@ -89,7 +89,7 @@ ShortestPathCalculator::ShortestPathCalculator(const MapPolygon &polygon) {
     // And 2-d matrix for the Floyd-Warshall algorithm
     m_next_vertex_in_path = std::vector<std::vector<size_t>>(m_polygon_points.size());
     std::for_each(m_next_vertex_in_path.begin(), m_next_vertex_in_path.end(),
-                  [&](auto &row) { row = std::vector<size_t>(m_polygon_points.size(), -1); });
+                  [&](auto &row) { row = std::vector<size_t>(m_polygon_points.size(), ~static_cast<size_t>(0)); });
     m_floyd_warshall_d = std::vector<std::vector<double>>(m_polygon_points.size());
     std::for_each(m_floyd_warshall_d.begin(), m_floyd_warshall_d.end(),
                   [&](auto &row) { row = std::vector<double>(m_polygon_points.size(), HUGE_VAL); });

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cmath>
 #include "algorithms.hpp"
+#include <math.h>
 
 // TODO: make most of methods external functions (maybe, working on not MapPolygons but just on vector<pair<double, double>>
 // TODO: make use of some external polygons library like
@@ -242,7 +243,7 @@ std::vector<MapPolygon> MapPolygon::split_into_pieces(double max_piece_area) {
 
     try {
 
-        int res_polygons = std::ceil(area() / max_piece_area);
+        auto res_polygons = static_cast<int>(std::ceil(area() / max_piece_area));
         double split_piece_area = area() / res_polygons;
         auto cur_polygon = *this;
         std::vector<MapPolygon> res;
@@ -269,7 +270,7 @@ std::vector<MapPolygon> MapPolygon::split_into_pieces(double max_piece_area) {
         }
         res.push_back(cur_polygon);
         return res;
-    } catch (std::runtime_error &e) {
+    } catch (std::runtime_error &) {
 //        m_logger->log_err("[PathGenerator]: ERROR while dividing polygon: " + std::string(e.what()));
     }
     return {};
@@ -328,7 +329,7 @@ namespace {
         }
         double l = 0, r = largest_area;
         auto current_num_of_pols = sub_polygons.size();
-        while (r - l > 1 and current_num_of_pols != n) {
+        while (r - l > 1 && current_num_of_pols != n) {
             double m = (r + l) / 2;
             size_t number_of_decomposed = 0;
             for (auto &pol: sub_polygons) {
