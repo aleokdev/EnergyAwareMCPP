@@ -24,6 +24,7 @@ struct algorithm_config_t {
     decomposition_type_t decomposition_type;
     int min_sub_polygons_per_uav;
     std::pair<double, double> start_pos;
+    std::pair<double, double> end_pos;
 
     int rotations_per_cell;
     int no_improvement_cycles_before_stop;
@@ -341,6 +342,13 @@ algorithm_config_t parse_algorithm_config(const YAML::Node &config) {
     algorithm_config.min_sub_polygons_per_uav = config["min_sub_polygons_per_uav"].as<int>();
 
     algorithm_config.start_pos = {config["start_x"].as<double>(), config["start_y"].as<double>()};
+    if (config["end_x"] && config["end_y"]) {
+        algorithm_config.end_pos = {config["end_x"].as<double>(), config["end_y"].as<double>()};
+    } else {
+        // If no end point is given, return to the starting position
+        algorithm_config.end_pos = algorithm_config.start_pos;
+    }
+
     algorithm_config.rotations_per_cell = config["rotations_per_cell"].as<int>();
     algorithm_config.no_improvement_cycles_before_stop = config["no_improvement_cycles_before_stop"].as<int>();
     algorithm_config.max_single_path_energy = config["max_single_path_energy"].as<double>();
@@ -402,8 +410,13 @@ solve_for_uavs(int n_uavs, const algorithm_config_t &algorithm_config,
                                                                                              algorithm_config.lat_lon_origin)
                                                                  :
                               algorithm_config.start_pos;
+        auto ending_point = algorithm_config.points_in_lat_lon ? gps_coordinates_to_meters(algorithm_config.end_pos,
+                                                                                             algorithm_config.lat_lon_origin)
+                                                                 :
+                              algorithm_config.end_pos;
         mstsp_solver::SolverConfig solver_config{algorithm_config.rotations_per_cell, algorithm_config.sweeping_step,
                                                  starting_point,
+                                                 ending_point,
                                                  static_cast<size_t>(n_uavs), 0,
                                                  0,
                                                  algorithm_config.no_improvement_cycles_before_stop};

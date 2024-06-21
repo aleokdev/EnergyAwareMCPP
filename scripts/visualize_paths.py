@@ -75,12 +75,19 @@ def main():
     for i in range(len(paths_points)):
         # Plot each path using a distinct color
         plt.plot(paths_points[i][:, 0], paths_points[i][:, 1],
-                 color=hsv_to_rgb([0.2 + 0.8 * (i / len(paths_points)), 0.8, 0.8]))
+                 color=hsv_to_rgb([0.2 + 0.8 * (i / len(paths_points)), 0.8, 0.8]), label = sys.argv[2 + i])
+        
+    if len(paths_points) > 0:
+        plt.plot(paths_points[0][0, 0], paths_points[0][0, 1], 'o',
+                 color=[0., 0., 0.], label = 'Start point')
+        plt.plot(paths_points[0][-1, 0], paths_points[0][-1, 1], 'x',
+                 color=[1., 0., 0.], label = 'End point')
 
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title("Visualization of AOI and generated paths")
     plt.axis('equal')
+    plt.legend()
 
     plt.show()
 

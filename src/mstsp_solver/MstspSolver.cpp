@@ -75,7 +75,7 @@ namespace mstsp_solver {
         energy += m_energy_calculator.calculate_straight_line_energy(0, a, 0, -a, m_config.starting_point,
                                                                      path[0].starting_point);
         energy += m_energy_calculator.calculate_straight_line_energy(0, a, 0, -a, path[path.size() - 1].end_point,
-                                                                     m_config.starting_point);
+                                                                     m_config.ending_point);
 
         return energy;
     }
@@ -199,13 +199,13 @@ namespace mstsp_solver {
             res.insert(res.end(), path.begin(), path.end());
             last_heading = target.rotation_angle;
         }
-        auto path_to_start = add_path_heading(
+        auto path_to_end = add_path_heading(
                 m_shortest_path_calculator.shortest_path_between_points({res.back().x, res.back().y},
-                                                                        m_config.starting_point), last_heading,
+                                                                        m_config.ending_point), last_heading,
                 unique_alt);
-        path_to_start.erase(path_to_start.begin());
+        path_to_end.erase(path_to_end.begin());
 
-        res.insert(res.end(), path_to_start.begin(), path_to_start.end());
+        res.insert(res.end(), path_to_end.begin(), path_to_end.end());
         return res;
     }
 
