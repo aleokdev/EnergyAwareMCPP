@@ -74,8 +74,10 @@ namespace mstsp_solver {
         auto a = m_energy_calculator.get_average_acceleration();
         energy += m_energy_calculator.calculate_straight_line_energy(0, a, 0, -a, m_config.starting_point,
                                                                      path[0].starting_point);
-        energy += m_energy_calculator.calculate_straight_line_energy(0, a, 0, -a, path[path.size() - 1].end_point,
-                                                                     m_config.ending_point);
+        if (auto ending_point = m_config.ending_point) {
+            energy += m_energy_calculator.calculate_straight_line_energy(0, a, 0, -a, path[path.size() - 1].end_point,
+                                                                        *ending_point);
+        }
 
         return energy;
     }
@@ -199,13 +201,15 @@ namespace mstsp_solver {
             res.insert(res.end(), path.begin(), path.end());
             last_heading = target.rotation_angle;
         }
-        auto path_to_end = add_path_heading(
-                m_shortest_path_calculator.shortest_path_between_points({res.back().x, res.back().y},
-                                                                        m_config.ending_point), last_heading,
-                unique_alt);
-        path_to_end.erase(path_to_end.begin());
+        if (auto ending_point = m_config.ending_point) {
+            auto path_to_end = add_path_heading(
+                    m_shortest_path_calculator.shortest_path_between_points({res.back().x, res.back().y},
+                                                                            *ending_point), last_heading,
+                    unique_alt);
+            path_to_end.erase(path_to_end.begin());
 
-        res.insert(res.end(), path_to_end.begin(), path_to_end.end());
+            res.insert(res.end(), path_to_end.begin(), path_to_end.end());
+        }
         return res;
     }
 

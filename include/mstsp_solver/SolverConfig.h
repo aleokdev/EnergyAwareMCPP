@@ -7,13 +7,14 @@
 
 #include "utils.hpp"
 #include <vector>
+#include <optional>
 
 namespace mstsp_solver {
     struct SolverConfig {
         int rotations_per_cell;
         double sweeping_step;
         point_t starting_point;
-        point_t ending_point;
+        std::optional<point_t> ending_point;
         size_t n_uavs;
         double sweeping_alt;
         double unique_alt_step = 1.0; // 1m difference while not sweeping by default

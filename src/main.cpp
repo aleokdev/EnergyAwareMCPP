@@ -10,6 +10,7 @@
 #include "SimpleLogger.h"
 #include "utils.hpp"
 #include <iomanip>
+#include <optional>
 
 // Struct defining full algorithm config in one place
 struct algorithm_config_t {
@@ -24,7 +25,7 @@ struct algorithm_config_t {
     decomposition_type_t decomposition_type;
     int min_sub_polygons_per_uav;
     std::pair<double, double> start_pos;
-    std::pair<double, double> end_pos;
+    std::optional<std::pair<double, double>> end_pos;
 
     int rotations_per_cell;
     int no_improvement_cycles_before_stop;
@@ -300,7 +301,7 @@ bool algorithm_config_is_valid(const YAML::Node &config) {
 }
 
 algorithm_config_t parse_algorithm_config(const YAML::Node &config) {
-    algorithm_config_t algorithm_config;
+    algorithm_config_t algorithm_config{};
     algorithm_config.energy_calculator_config.drone_mass = config["drone_mass"].as<double>();
     algorithm_config.energy_calculator_config.drone_area = config["drone_area"].as<double>();
     algorithm_config.energy_calculator_config.average_acceleration = config["average_acceleration"].as<double>();
@@ -344,9 +345,6 @@ algorithm_config_t parse_algorithm_config(const YAML::Node &config) {
     algorithm_config.start_pos = {config["start_x"].as<double>(), config["start_y"].as<double>()};
     if (config["end_x"] && config["end_y"]) {
         algorithm_config.end_pos = {config["end_x"].as<double>(), config["end_y"].as<double>()};
-    } else {
-        // If no end point is given, return to the starting position
-        algorithm_config.end_pos = algorithm_config.start_pos;
     }
 
     algorithm_config.rotations_per_cell = config["rotations_per_cell"].as<int>();
@@ -410,10 +408,13 @@ solve_for_uavs(int n_uavs, const algorithm_config_t &algorithm_config,
                                                                                              algorithm_config.lat_lon_origin)
                                                                  :
                               algorithm_config.start_pos;
-        auto ending_point = algorithm_config.points_in_lat_lon ? gps_coordinates_to_meters(algorithm_config.end_pos,
-                                                                                             algorithm_config.lat_lon_origin)
-                                                                 :
-                              algorithm_config.end_pos;
+        std::optional<point_t> ending_point{};
+        if (auto end_pos = algorithm_config.end_pos) {
+            ending_point = algorithm_config.points_in_lat_lon ? gps_coordinates_to_meters(*end_pos,
+                                                                                          algorithm_config.lat_lon_origin)
+                                                              :
+                           algorithm_config.end_pos;
+        }
         mstsp_solver::SolverConfig solver_config{algorithm_config.rotations_per_cell, algorithm_config.sweeping_step,
                                                  starting_point,
                                                  ending_point,
